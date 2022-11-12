@@ -1,16 +1,14 @@
-function Country({ country }) {
+import CountryInfo from "./CountryInfo";
+import Weather from "./Weather";
+
+function Country({ country, weatherInfo }) {
   return (
     <div>
-      <h2>{country.name.common}</h2>
-      <div>Captial {country.capital[0]}</div>
-      <div>Area {country.area}</div>
-      <h4>languages:</h4>
-      <ul>
-        {Object.entries(country.languages).map((language) => (
-          <li key={language[0]}>{language[1]}</li>
-        ))}
-      </ul>
-      <img src={country.flags.png} alt="flags" />
+      <CountryInfo country={country} />
+      <br />
+      {weatherInfo.main ? (
+        <Weather country={country.capital[0]} weatherInfo={weatherInfo} />
+      ) : null}
     </div>
   );
 }

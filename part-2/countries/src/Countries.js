@@ -1,7 +1,6 @@
-import { Country } from "./Country";
 import { CountryList } from "./CountryList";
 
-function Countries({ countriesStore, selectedCountry, setSelectedCountry }) {
+function Countries({ countriesStore, setSelectedCountry }) {
   const showCountries = () => {
     if (countriesStore.length > 10) {
       return "Too many matches, specify another filter";
@@ -15,11 +14,7 @@ function Countries({ countriesStore, selectedCountry, setSelectedCountry }) {
     }
   };
 
-  return Object.keys(selectedCountry).length ? (
-    <Country country={selectedCountry} />
-  ) : (
-    showCountries()
-  );
+  return showCountries();
 }
 
 export { Countries };
