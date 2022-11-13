@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Persons from "./Persons";
 import PhoneBookForm from "./PhoneBookForm";
+import Notification from "./Notification";
 import phoneBookService from "./services/phoneBookService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorType, setErrorType] = useState(null);
 
   const filteredPerson = searchText.length
     ? persons.filter((person) =>
@@ -30,6 +33,9 @@ const App = () => {
     if (!existingPerson) {
       phoneBookService.addInfo(newNameObj).then((returnedDetails) => {
         setPersons(persons.concat(returnedDetails));
+        setErrorMessage(`User ${newName} added successfully`);
+        setErrorType("success");
+        setTimeout(() => setErrorMessage(null), 5000);
       });
       return;
     }
@@ -50,6 +56,14 @@ const App = () => {
             person.id === returnedDetails.id ? returnedDetails : person
           )
         );
+        setErrorMessage(`Number updated to ${newNumber}`);
+        setErrorType("success");
+        setTimeout(() => setErrorMessage(null), 5000);
+      })
+      .catch((error) => {
+        setErrorMessage(`Error: ${newName} already deleted!!`);
+        setErrorType("error");
+        setTimeout(() => setErrorMessage(null), 5000);
       });
   };
 
@@ -68,6 +82,8 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter searchText={searchText} setSearchText={setSearchText} />
       <PhoneBookForm addNewPerson={addNewPerson} />
+      <br />
+      <Notification message={errorMessage} type={errorType} />
       <Persons persons={filteredPerson} deletePerson={onDeletePerson} />
     </div>
   );
