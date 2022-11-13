@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./Filter";
 import Persons from "./Persons";
 import PhoneBookForm from "./PhoneBookForm";
-import axios from "axios";
+import phoneBookService from "./services/phoneBookService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -15,23 +15,52 @@ const App = () => {
     : persons;
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => setPersons(response.data));
+    phoneBookService
+      .getAll()
+      .then((returnedDetails) => setPersons(returnedDetails));
   }, []);
 
   const addNewPerson = (e, newName, newNumber) => {
     e.preventDefault();
+    let existingPerson = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
     let newNameObj = { name: newName, number: newNumber };
-    if (
-      persons.find(
-        (person) => JSON.stringify(person) === JSON.stringify(newNameObj)
-      )
-    ) {
-      alert(`${newName} is already added to phonebook`);
+
+    if (!existingPerson) {
+      phoneBookService.addInfo(newNameObj).then((returnedDetails) => {
+        setPersons(persons.concat(returnedDetails));
+      });
       return;
     }
-    setPersons(persons.concat(newNameObj));
+
+    if (existingPerson.number === newNumber) {
+      alert(`${newName} - ${newNumber} is already exists`);
+      return;
+    }
+
+    phoneBookService
+      .updateInfo(existingPerson.id, {
+        name: existingPerson.name,
+        number: newNumber,
+      })
+      .then((returnedDetails) => {
+        setPersons(
+          persons.map((person) =>
+            person.id === returnedDetails.id ? returnedDetails : person
+          )
+        );
+      });
+  };
+
+  const onDeletePerson = (id) => {
+    phoneBookService.deleteInfo(id).then((deleteResponse) => {
+      if (deleteResponse.status === 200) {
+        setPersons(persons.filter((person) => person.id !== id));
+      } else {
+        alert(`Error: ${deleteResponse.statusText}`);
+      }
+    });
   };
 
   return (
@@ -39,7 +68,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter searchText={searchText} setSearchText={setSearchText} />
       <PhoneBookForm addNewPerson={addNewPerson} />
-      <Persons persons={filteredPerson} />
+      <Persons persons={filteredPerson} deletePerson={onDeletePerson} />
     </div>
   );
 };
