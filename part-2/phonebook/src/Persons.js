@@ -1,3 +1,5 @@
+import React from "react";
+
 function Person({ person, deletePerson }) {
   const onClickDelete = () => {
     const canDelete = window.confirm(`Delete ${person.name} ?`);

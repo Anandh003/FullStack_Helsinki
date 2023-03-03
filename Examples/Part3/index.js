@@ -3,11 +3,10 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const Note = require("./models/note");
-const { response } = require("express");
 
-app.use(cors());
-app.use(express.json());
 app.use(express.static("build"));
+app.use(express.json());
+app.use(cors());
 
 const PORT = process.env.PORT;
 
@@ -39,16 +38,19 @@ app.get("/api/notes/:id", (request, response) => {
     });
 });
 
-app.post("/api/notes", (request, response) => {
-  if (!request.body.content) {
-    return response.status(400).json({ error: "contetnt missing" });
-  }
+app.post("/api/notes", (request, response, next) => {
   const body = request.body;
   const note = new Note({
     content: body.content,
     important: body.important || false,
   });
-  note.save().then((savedNote) => response.json(savedNote));
+  note
+    .save()
+    .then((savedNote) => response.json(savedNote))
+    .catch((err) => {
+      console.log("inside catch block");
+      next(err);
+    });
 });
 
 app.delete("/api/notes/:id", (request, response, next) => {
@@ -65,14 +67,29 @@ app.put("/api/notes/:id", (request, reponse, next) => {
     important: body.important,
   };
 
-  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+  Note.findByIdAndUpdate(request.params.id, note, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((updatedNote) => {
-      debugger;
       reponse.json(updatedNote);
     })
     .catch((err) => next(err));
 });
 
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError")
+    return response.status(400).send({ error: "malformatted id" });
+  else if (error.name === "ValidationError")
+    return response.status(400).send({ error: error.message });
+
+  next(error);
+};
+
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
