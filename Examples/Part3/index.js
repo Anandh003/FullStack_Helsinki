@@ -48,7 +48,6 @@ app.post("/api/notes", (request, response, next) => {
     .save()
     .then((savedNote) => response.json(savedNote))
     .catch((err) => {
-      console.log("inside catch block");
       next(err);
     });
 });
