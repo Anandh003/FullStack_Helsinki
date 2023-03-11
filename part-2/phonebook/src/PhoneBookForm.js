@@ -28,7 +28,7 @@ function PhoneBookForm({ addNewPerson }) {
         </div>
         <div>
           number:{" "}
-          <input type={"number"} onChange={onNumberChange} value={newNumber} />
+          <input type={"tel"} onChange={onNumberChange} value={newNumber} />
         </div>
         <div>
           <button type="submit">add</button>
