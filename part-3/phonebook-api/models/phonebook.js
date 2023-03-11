@@ -9,8 +9,20 @@ mongoose
   .catch((err) => console.log("Error connecting to MongoDB", err.message));
 
 const phoneBookSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    required: true,
+    minLength: 3,
+  },
+  number: {
+    type: String,
+    required: true,
+    minLength: 9,
+    validate: {
+      validator: (v) => /\d{2,3}-\d{6,}/.test(v),
+      message: (v) => `${v.value} is not valid number.`,
+    },
+  },
 });
 
 phoneBookSchema.set("toJSON", {

@@ -37,18 +37,6 @@ const getUniqueId = () => {
   return max + 1;
 };
 
-const errorHandler = (error, request, response, next) => {
-  console.error(error);
-
-  if (error.name === "CastError") {
-    return response.status(404).send({ error: "Malformatted id" });
-  }
-
-  next(error);
-};
-
-app.use(errorHandler);
-
 app.get("/api/persons", (request, response) => {
   phoneBook.find({}).then((entries) => response.json(entries));
 });
@@ -63,25 +51,18 @@ app.get("/api/persons/:id", (request, response, next) => {
     .catch((err) => next(err));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
-  if (!body.content)
-    return response.status(400).json({ error: "Content Missing" });
-
-  if (!body.name)
-    return response.status(400).json({ error: "name is missing" });
-
-  if (!body.number)
-    return response.status(400).json({ error: "number is missing" });
 
   const person = new phoneBook({
-    id: Math.floor(Math.random() * 10000),
-    content: body.content,
     name: body.name,
     number: body.number,
   });
 
-  person.save().then((result) => response.json(person));
+  person
+    .save()
+    .then((result) => response.json(person))
+    .catch((err) => next(err));
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
@@ -97,14 +78,19 @@ app.put("/api/persons/:id", (request, response, next) => {
   if (!id) return response.status(400).json({ error: "Resource Id Missing" });
 
   phoneBook
-    .findOneAndUpdate({ _id: id }, { ...request.body }, { new: true })
+    .findOneAndUpdate(
+      { _id: id },
+      { ...request.body },
+      { new: true, runValidators: true, context: "query" }
+    )
     .then((result) => {
       if (result) {
         response.status(200).json(result);
         return;
       }
       response.status(500).json({ error: "Invalid return" });
-    });
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/info", (request, response) => {
@@ -120,6 +106,17 @@ app.get("/info", (request, response) => {
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
+
+const errorHandler = (error, request, response, next) => {
+  if (error.name === "CastError") {
+    return response.status(404).send({ error: "Malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(404).send({ error: error.message });
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 app.use(unknownEndpoint);
 
