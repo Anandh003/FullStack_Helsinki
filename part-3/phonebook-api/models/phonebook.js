@@ -5,7 +5,7 @@ const URL = process.env.MONGODB_URI;
 mongoose.set("strictQuery", false);
 mongoose
   .connect(URL)
-  .then((result) => console.log("Connected to MongoDB"))
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log("Error connecting to MongoDB", err.message));
 
 const phoneBookSchema = new mongoose.Schema({

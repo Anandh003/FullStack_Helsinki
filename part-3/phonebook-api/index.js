@@ -3,7 +3,6 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const phoneBook = require("./models/phonebook");
-const { default: mongoose } = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -23,19 +22,13 @@ app.use(cors());
 const requestLogger = morgan(
   ":method :url :status :res[content-length] - :response-time ms :req-body",
   {
-    skip: (req, res) => req.method !== "POST",
+    skip: (req) => req.method !== "POST",
   }
 );
 
-morgan.token("req-body", (req, res) => JSON.stringify(req.body));
+morgan.token("req-body", (req) => JSON.stringify(req.body));
 
 app.use(requestLogger);
-
-const getUniqueId = () => {
-  const max =
-    entries.length > 0 ? Math.max(...entries.map((entry) => entry.id)) : 0;
-  return max + 1;
-};
 
 app.get("/api/persons", (request, response) => {
   phoneBook.find({}).then((entries) => response.json(entries));
@@ -61,14 +54,14 @@ app.post("/api/persons", (request, response, next) => {
 
   person
     .save()
-    .then((result) => response.json(person))
+    .then(() => response.json(person))
     .catch((err) => next(err));
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
   phoneBook
     .findByIdAndDelete(request.params.id)
-    .then((result) => response.status(204).end())
+    .then(() => response.status(204).end())
     .catch((err) => next(err));
 });
 
