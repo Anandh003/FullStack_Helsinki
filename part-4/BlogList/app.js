@@ -15,7 +15,7 @@ mongoose
   .then(() => logger.info("Connected to DB"))
   .catch((err) => logger.error(`Error in DB ${err.message}`));
 
-app.use("/api/blog", blogListRouter);
+app.use("/api/blogs", blogListRouter);
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
