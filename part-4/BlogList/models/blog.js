@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -7,9 +7,9 @@ const blogSchema = new mongoose.Schema({
   likes: { type: Number, default: 0 },
 });
 
-const Blog = mongoose.model("Blog", blogSchema);
+const Blog = mongoose.model('Blog', blogSchema);
 
-blogSchema.set("toJSON", {
+blogSchema.set('toJSON', {
   transform: (document, returnObj) => {
     returnObj.id = returnObj._id.toString();
     delete returnObj._id;

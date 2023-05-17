@@ -1,8 +1,8 @@
-const Blog = require("../models/blog");
-const helper = require("./blog_helper");
-const app = require("../app");
-const superTest = require("supertest");
-const { default: mongoose } = require("mongoose");
+const Blog = require('../models/blog');
+const helper = require('./blog_helper');
+const app = require('../app');
+const superTest = require('supertest');
+const { default: mongoose } = require('mongoose');
 const api = superTest(app);
 
 beforeEach(async () => {
@@ -13,30 +13,30 @@ beforeEach(async () => {
   await Promise.all(promiseArray);
 });
 
-test("all notes are returned", async () => {
-  const blogs = await api.get("/api/blogs");
+test('all notes are returned', async () => {
+  const blogs = await api.get('/api/blogs');
 
   expect(blogs.body).toHaveLength(helper.initialBlogs.length);
 });
 
-test("has id property", async () => {
-  const blogs = await api.get("/api/blogs");
+test('has id property', async () => {
+  const blogs = await api.get('/api/blogs');
 
   expect(blogs.body).toBeDefined();
 });
 
-test("post blog", async () => {
+test('post blog', async () => {
   const newBlog = {
-    title: "new Title",
-    author: "shakespear",
-    url: "newTitle.com",
+    title: 'new Title',
+    author: 'shakespear',
+    url: 'newTitle.com',
     likes: 0,
   };
 
-  const response = await api.post("/api/blogs")
+  const response = await api.post('/api/blogs')
     .send(newBlog)
     .expect(201)
-    .expect("Content-Type", /application\/json/);
+    .expect('Content-Type', /application\/json/);
 
   const newBlogId = response.body.id;
 
@@ -49,37 +49,37 @@ test("post blog", async () => {
   expect(blog.body).toMatchObject(newBlog);
 });
 
-test("Missing likes", async () => {
+test('Missing likes', async () => {
   const newBlog = {
-    title: "new Title",
-    author: "shakespear",
-    url: "newTitle.com",
+    title: 'new Title',
+    author: 'shakespear',
+    url: 'newTitle.com',
   };
 
-  const response = await api.post("/api/blogs")
+  const response = await api.post('/api/blogs')
     .send(newBlog)
     .expect(201)
-    .expect("Content-Type", /application\/json/);
+    .expect('Content-Type', /application\/json/);
 
   const newBlogId = response.body.id;
 
   const blog = await api.get(`/api/blogs/${newBlogId}`);
-  expect(blog.body).toHaveProperty("likes", 0);
+  expect(blog.body).toHaveProperty('likes', 0);
 });
 
-test("Check Mandatory Fields", async () => {
+test('Check Mandatory Fields', async () => {
   const newBlog = {
-    author: "Shakespear",
+    author: 'Shakespear',
     likes: 2,
   };
 
-  await api.post("/api/blogs")
+  await api.post('/api/blogs')
     .send(newBlog)
     .expect(400)
-    .expect("Content-Type", /application\/json/);
+    .expect('Content-Type', /application\/json/);
 });
 
-test("delete single blog post", async () => {
+test('delete single blog post', async () => {
   const blogsAtStart = await helper.blogsInDb();
 
   const blogToBeDeleted = blogsAtStart[0];
@@ -92,12 +92,12 @@ test("delete single blog post", async () => {
 
 });
 
-test("Update blog post", async () => {
+test('Update blog post', async () => {
   const blogsAtStart = await helper.blogsInDb();
 
   let blogsToBeUpdate = blogsAtStart[0];
 
-  blogsToBeUpdate = { ...blogsToBeUpdate, title: "helloWorld" };
+  blogsToBeUpdate = { ...blogsToBeUpdate, title: 'helloWorld' };
 
   const response = await api
     .put(`/api/blogs/${blogsToBeUpdate.id}`)

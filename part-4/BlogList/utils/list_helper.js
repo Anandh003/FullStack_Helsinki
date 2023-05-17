@@ -1,4 +1,4 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
 const dummy = (blogs) => {
   return 1;
@@ -20,7 +20,7 @@ const getMinimalBlogInfo = ({ likes, author, title }) => {
 
 const favoriteBlog = (blogs) => {
   const reducer = (acc, item) => {
-    return "likes" in acc
+    return 'likes' in acc
       ? item.likes > acc.likes
         ? getMinimalBlogInfo(item)
         : acc
@@ -47,7 +47,7 @@ const mostBlogs = (blogs) => {
   const blogsByAuthor = groupBlogsByAuthor(blogs);
 
   const mostBlogs = Object.entries(blogsByAuthor).reduce((acc, item) => {
-    if (!("blogs" in acc)) {
+    if (!('blogs' in acc)) {
       return { author: item[0], blogs: item[1].length };
     }
 
@@ -70,7 +70,7 @@ const mostLikes = (blogs) => {
   return Object.entries(blogsByAuthor).reduce((acc, item) => {
     const totalLikes = item[1].reduce(sumOfLikesReducer, 0);
 
-    if (!("likes" in acc)) return { author: item[0], likes: totalLikes };
+    if (!('likes' in acc)) return { author: item[0], likes: totalLikes };
 
     if (acc.likes < totalLikes) return { author: item[0], likes: totalLikes };
 

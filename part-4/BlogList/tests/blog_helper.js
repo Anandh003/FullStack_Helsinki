@@ -1,16 +1,16 @@
-const Blog = require("../models/blog");
+const Blog = require('../models/blog');
 
 const initialBlogs = [
   {
-    title: "No Title",
-    author: "Sharma",
-    url: "www.notitle.com",
+    title: 'No Title',
+    author: 'Sharma',
+    url: 'www.notitle.com',
     likes: 2,
   },
   {
-    title: "Money",
-    author: "Unknown",
-    url: "unknown.com",
+    title: 'Money',
+    author: 'Unknown',
+    url: 'unknown.com',
     likes: 0
   }
 ];
